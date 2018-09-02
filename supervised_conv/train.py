@@ -1,16 +1,14 @@
 import os
-import datetime
 import argparse
 
 import pandas as pd
 import numpy as np
 
 from sklearn.model_selection import train_test_split
-from keras.callbacks import ModelCheckpoint
-from keras.optimizers import Adam
+from keras.callbacks import ModelCheckpoint, TensorBoard
 
-from common.image_processor import batch_generator, INPUT_SHAPE
-from common.utils import s2b
+from supervised_conv.image_processor import batch_generator, INPUT_SHAPE
+from supervised_conv.utils import s2b
 
 from supervised_conv.nvidia_model import NvidiaModel
 
@@ -43,13 +41,15 @@ def train_model(model, args, X_train, X_valid, y_train, y_valid):
                                  save_best_only=args.save_best_only,
                                  mode='auto')
 
+    tensorboard = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
+
     model.fit_generator(batch_generator(args.data_dir, X_train, y_train, args.batch_size, True),
                         args.samples_per_epoch,
                         args.nb_epoch,
                         max_q_size=1,
                         validation_data=batch_generator(args.data_dir, X_valid, y_valid, args.batch_size, False),
                         nb_val_samples=len(X_valid),
-                        callbacks=[checkpoint],
+                        callbacks=[checkpoint, tensorboard],
                         verbose=1)
 
 

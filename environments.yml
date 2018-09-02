@@ -19,6 +19,7 @@ dependencies:
     - pandas
     - imageio
     - cv2
+    - tensorboard
     - pip:
         - moviepy
         - tensorflow==1.1

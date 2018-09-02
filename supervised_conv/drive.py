@@ -9,11 +9,10 @@ import eventlet.wsgi
 from PIL import Image
 from flask import Flask
 from io import BytesIO
-import time
 
 from keras.models import load_model
 
-from common.image_processor import preprocess_image
+from supervised_conv.image_processor import preprocess_image
 
 sio = socketio.Server()
 app = Flask(__name__)
@@ -37,15 +36,18 @@ def telemetry(sid, data):
             image = preprocess_image(image)
             image = np.array([image])
 
-            steering_angle = float(model.predict(image, batch_size=1))
-            # steering_angle, throttle = [float(x) for x in model.predict(image, batch_size=1)[0]]
+            # steering_angle = float(model.predict(image, batch_size=1))
+            steering_angle, throttle = [float(x) for x in model.predict(image, batch_size=1)[0]]
 
-            global speed_limit
-            if speed > speed_limit:
-                speed_limit = MIN_SPEED
-            else:
-                speed_limit = MAX_SPEED
-            throttle = 1.0 - steering_angle**2 - (speed/speed_limit)**2
+            if speed >= 15:
+                throttle = 0
+
+            # global speed_limit
+            # if speed > speed_limit:
+            #     speed_limit = MIN_SPEED
+            # else:
+            #     speed_limit = MAX_SPEED
+            # throttle = 1.0 - steering_angle**2 - (speed/speed_limit)**2
 
             print('{} {} {}'.format(steering_angle, throttle, speed))
             send_control(steering_angle, throttle)

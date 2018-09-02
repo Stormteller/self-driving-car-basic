@@ -190,3 +190,5 @@ $RECYCLE.BIN/
 # End of https://www.gitignore.io/api/python,windows,pycharm+all
 
 supervised_models/
+imgs/
+__pycache__/
